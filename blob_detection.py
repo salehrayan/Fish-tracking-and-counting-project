@@ -34,7 +34,7 @@ label_paths_train, label_paths_test = train_test_split(label_paths, test_size=0.
 labels_test, videos_without_rois_test = concat_vid_rois_and_labels(video_paths_test, ROI_paths_test, label_paths_test)
 
 
-fgbg = cv2.bgsegm.createBackgroundSubtractorMOG()
+fgbg = cv2.bgsegm.createBackgroundSubtractorLSBP()
 
 params = cv2.SimpleBlobDetector_Params()
 params.minThreshold = 0
@@ -42,14 +42,14 @@ params.maxThreshold = 255
 params.filterByColor = True
 params.blobColor = 255
 params.filterByArea = True
-params.minArea = 15
+params.minArea = 10
 # params.maxArea = 1000
-params.filterByInertia = True
+# params.filterByInertia = True
 params.minInertiaRatio = 0.001
 
-params.filterByCircularity = True
+# params.filterByCircularity = True
 params.minCircularity = 0.001
-params.filterByConvexity = True
+# params.filterByConvexity = True
 params.minConvexity = 0.001
 detector = cv2.SimpleBlobDetector_create(params)
 

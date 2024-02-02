@@ -36,13 +36,13 @@ labels_test, videos_without_rois_test = concat_vid_rois_and_labels(video_paths_t
 fgbg = cv2.bgsegm.createBackgroundSubtractorMOG()
 
 
-kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
 plt.figure(figsize=(12,7))
 for i in range(300):
     # applying on each frame
     fgmask = fgbg.apply(videos_without_rois_test[i, :, :, :])
 
-    # fgmask = cv2.morphologyEx(fgmask, cv2.MORPH_ERODE, kernel)
+    fgmask = cv2.morphologyEx(fgmask, cv2.MORPH_ERODE, kernel)
 
     plt.subplot(1, 2, 1)
     plt.imshow(fgmask, cmap='gray')
@@ -51,5 +51,5 @@ for i in range(300):
 
     plt.tight_layout()
     plt.draw()
-    plt.pause(0.2)
+    plt.pause(0.1)
     plt.clf()
