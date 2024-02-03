@@ -148,15 +148,21 @@ class CandidateOrFish:
             [[1, 0, 0, 0],
              [0, 1, 0, 0],
              [0, 0, 1, 0],
-             [0, 0, 0, 1]], np.float32) * 0.01
-        self.kalman.statePre = np.array([[initial_position[0]], [initial_position[1]], [0], [15]], np.float32)
-        self.kalman.statePost = np.array([[initial_position[0]], [initial_position[1]], [0], [15]], np.float32)
+             [0, 0, 0, 1]], np.float32) * 0.1
+        self.kalman.measurementNoiseCov = np.array([[1, 0],
+                                                    [0, 1]], dtype=np.float32) * 0.01
+        # self.kalman.statePre = np.array([[initial_position[0]], [initial_position[1]], [0], [7]], np.float32)
+        # self.kalman.statePost = np.array([[initial_position[0]], [initial_position[1]], [0], [7]], np.float32)
+        self.kalman.predict()
+        self.kalman.correct(np.reshape(self.initial_position, (2, 1)))
 
-
-    def update_and_predict(self):
-        self.kalman.correct(np.reshape(self.position, (2, 1)))
+    def kalman_predict(self):
+        # self.kalman.correct(np.reshape(self.position, (2, 1)))
         temp = self.kalman.predict()
         return temp
+
+    def kalman_correct(self):
+        self.kalman.correct(np.reshape(self.position, (2, 1)))
 
     def update_position_diameter_appearance(self, position, diameter):
         self.position = position
@@ -200,7 +206,7 @@ def tracking(keypoints, fishes, candidates, posy):
         return keypoints, fishes, candidates
     for jesm in [obj for obj in fishes+candidates if getattr(obj, 'counted') == 0]:
         shortest_distance = 10000000
-        predicted_pos = jesm.update_and_predict()
+        predicted_pos = jesm.kalman_predict()
         to_remove = []
         for k in keypoints:
             k_distance = np.linalg.norm(predicted_pos[0:2, 0] - np.array(k.pt))
@@ -209,11 +215,12 @@ def tracking(keypoints, fishes, candidates, posy):
                 shortest_distance = k_distance
                 nearest_keypoint = k
                 to_remove = [k]
-        # if shortest_distance > 50:
-        #     continue
+        if shortest_distance > 50:
+            continue
         for obj in to_remove:
             keypoints.remove(obj)
         jesm.update_position_diameter_appearance(np.array(nearest_keypoint.pt, dtype=np.float32), nearest_keypoint.size)
+        jesm.kalman_correct()
         if len(keypoints) == 0:
             break
     for jesm in [obj for obj in candidates if getattr(obj, 'counted') == 0]:
@@ -230,7 +237,7 @@ def counting(fishes, posy, count, counted_fish):
             median_dm.append(jesm.diameter)
         median_dm = np.median(median_dm)
 
-    if count == 1:
+    if count == 3:
         t = 3
     for jesm in fishes:
         if jesm.counted == 0 and jesm.position[1] > posy:

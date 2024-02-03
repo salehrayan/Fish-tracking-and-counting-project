@@ -29,9 +29,9 @@ video_paths_train, video_paths_test = train_test_split(video_paths, test_size=0.
 ROI_paths_train, ROI_paths_test = train_test_split(ROI_paths, test_size=0.25, random_state=42)
 label_paths_train, label_paths_test = train_test_split(label_paths, test_size=0.25, random_state=42)
 
-sample_labels, sample_videoes_without_roi, posy = load_video_with_ROI_with_separate_label(video_paths_train[1],
-                                                                                          ROI_paths_train[1],
-                                                                                          label_paths_train[1])
+sample_labels, sample_videoes_without_roi, posy = load_video_with_ROI_with_separate_label(video_paths_train[3],
+                                                                                          ROI_paths_train[3],
+                                                                                          label_paths_train[3])
 
 posy = math.floor(posy) + 40
 
@@ -65,7 +65,7 @@ candidates = []
 IDs = []
 diameters = []
 count = 0
-required_appearances = 5
+required_appearances = 3
 
 
 def update_frame(t):
@@ -77,7 +77,7 @@ def update_frame(t):
     global counted_fish
     fgmask = fgbg.apply(sample_videoes_without_roi[t, :, :, :])
 
-    fgmask = cv2.morphologyEx(fgmask, cv2.MORPH_ERODE, kernel)
+    # fgmask = cv2.morphologyEx(fgmask, cv2.MORPH_ERODE, kernel)
 
     keypoints = detector.detect(fgmask)
 
@@ -92,16 +92,16 @@ def update_frame(t):
 
     im_with_keypoints[posy, :, 0] = 255
 
-    plt.subplot(1, 3, 1)
+    plt.subplot(1, 2, 1)
     plt.imshow(fgmask, cmap='gray', vmin=0, vmax=255)
-    plt.subplot(1, 3, 2)
+    plt.subplot(1, 2, 2)
     plt.title(f'Computer Count: {count}, Real Count: {np.sum(sample_labels[0:t], dtype=np.int32)}')
     plt.imshow(im_with_keypoints)
     for kp in keypoints:
         x, y = kp.pt
         plt.scatter(x, y, c='red', s=1)
-    plt.subplot(1, 3, 3)
-    plt.imshow(sample_videoes_without_roi[t, :, :, :])
+    # plt.subplot(1, 3, 3)
+    # plt.imshow(sample_videoes_without_roi[t, :, :, :])
     plt.tight_layout()
     plt.draw()
     plt.pause(0.1)
