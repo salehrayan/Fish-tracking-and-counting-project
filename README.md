@@ -6,4 +6,4 @@ Python implementation sample:
 Not perfect, performs poorer as fishes overlap more and more.
 
 Smoother MATLAB implementation:
-![matlab.gif](https://github.com/salehrayan/Fish-tracking-and-counting-project/blob/main/matlab_demo.gif)
+![matlab.gif](https://github.com/salehrayan/Fish-tracking-and-counting-project/blob/main/Matlab_demo.gif)
